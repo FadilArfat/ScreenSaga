@@ -33,7 +33,6 @@ export const getSearch = async ({ keyword, page = 1 }) => {
         },
         headers: {
           Authorization: `Bearer ${import.meta.env.VITE_API_ACCESS_TOKEN}`,
-          // Add any other headers as needed
         },
       }
     );
@@ -41,6 +40,27 @@ export const getSearch = async ({ keyword, page = 1 }) => {
     return response.data;
   } catch (error) {
     console.error("Error fetching search data:", error);
+    throw error;
+  }
+};
+
+export const getDetails = async ({ movieId }) => {
+  try {
+    const response = await axios.get(
+      `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
+      {
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_API_ACCESS_TOKEN}`,
+        },
+        params: {
+          append_to_response: "credits",
+        },
+      }
+    );
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.log("Error Fetching Data :", error);
     throw error;
   }
 };
