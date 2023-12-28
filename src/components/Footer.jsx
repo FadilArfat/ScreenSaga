@@ -14,19 +14,19 @@ const Footer = () => {
           <div className="flex mt-2">
             <a
               href="#"
-              className="mx-2 hover:text-gray-400 transition duration-300"
+              className="mx-2 text-blue-500 hover:text-gray-400 transition duration-300"
             >
               Home
             </a>
             <a
               href="#"
-              className="mx-2 hover:text-gray-400 transition duration-300"
+              className="mx-2 text-blue-500 hover:text-gray-400 transition duration-300"
             >
               About
             </a>
             <a
               href="#"
-              className="mx-2 hover:text-gray-400 transition duration-300"
+              className="mx-2 text-blue-500 hover:text-gray-400 transition duration-300"
             >
               Contact
             </a>

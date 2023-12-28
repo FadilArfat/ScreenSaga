@@ -1,18 +1,20 @@
-import { useQuery } from "@tanstack/react-query";
 import { Link, useParams } from "react-router-dom";
-import { getDetails } from "../api/api";
 import { Image } from "@nextui-org/react";
 import dayjs from "dayjs";
 import MainLayout from "../layout/main-layout";
 import { CastList } from "../components/CastList";
 import { IoIosArrowForward } from "react-icons/io";
+import { useDetails } from "../services/queries";
 
 export default function Details() {
   let { movieId } = useParams();
-  const { data, isLoading } = useQuery({
-    queryKey: ["moviesDetail", movieId],
-    queryFn: () => getDetails({ movieId }),
-  });
+
+  // const { data, isLoading } = useQuery({
+  //   queryKey: ["moviesDetail", movieId],
+  //   queryFn: () => getDetails({ movieId }),
+  // });
+
+  const { data, isLoading } = useDetails(movieId);
   //   console.log(data);
   const calcTime = (time) => {
     const hours = Math.floor(time / 60);

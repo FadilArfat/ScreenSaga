@@ -1,5 +1,4 @@
 import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
-import { getSearch, getUpcoming } from "../api/api";
 import { Cards } from "../components/Cards";
 import { Slider } from "../components/Slider";
 import { Input, Spinner } from "@nextui-org/react";
@@ -7,6 +6,8 @@ import { useState } from "react";
 import { CiSearch } from "react-icons/ci";
 import useDebounce from "../hooks/useDebounce";
 import MainLayout from "../layout/main-layout";
+import { getSearch, getUpcoming } from "../services/api";
+import { useNowPlaying, useSearch } from "../services/queries";
 
 export const Home = () => {
   const [search, setSearch] = useState("");
@@ -18,14 +19,7 @@ export const Home = () => {
     fetchNextPage,
     hasNextPage,
     isFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["movies"],
-    queryFn: ({ pageParam = 1 }) => getUpcoming(pageParam),
-    getNextPageParam: (lastPage) => {
-      const nextPage = lastPage.page + 1;
-      return nextPage <= lastPage.total_pages ? nextPage : undefined;
-    },
-  });
+  } = useNowPlaying();
 
   const {
     data: searchResults,
@@ -33,22 +27,14 @@ export const Home = () => {
     fetchNextPage: fetchNextSearchPage,
     hasNextPage: searchHasNextPage,
     isFetchingNextPage: searchIsFetchingNextPage,
-  } = useInfiniteQuery({
-    queryKey: ["search", debouncedSearchTerm],
-    queryFn: ({ pageParam = 1 }) =>
-      getSearch({ keyword: debouncedSearchTerm, page: pageParam }),
-    getNextPageParam: (lastPage) => {
-      const nextPage = lastPage.page + 1;
-      return nextPage <= lastPage.total_pages ? nextPage : undefined;
-    },
-    enabled: Boolean(debouncedSearchTerm),
-  });
+  } = useSearch(debouncedSearchTerm);
 
   const movieData = search ? searchResults : movies;
+  console.log(movieData);
 
   return (
     <MainLayout>
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900">
+      <div className="flex flex-col items-center justify-center min-h-screen ">
         <Slider data={movies?.pages[0]?.results ?? []} />
         <div className="w-full sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%]">
           <Input
@@ -108,34 +94,28 @@ export const Home = () => {
           {!search && (
             <div className="flex justify-center my-4">
               <button
-                onClick={() => {
-                  fetchNextPage();
-                }}
-                disabled={!hasNextPage}
-                className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+                onClick={() => fetchNextPage()}
+                disabled={!hasNextPage || isFetchingNextPage}
               >
-                {loadQuery
-                  ? "Loading..."
+                {isFetchingNextPage
+                  ? "Loading more..."
                   : hasNextPage
                   ? "Load More"
-                  : "No More Data"}
+                  : "Nothing more to load"}
               </button>
             </div>
           )}
           {search && (
             <div className="flex justify-center my-4">
               <button
-                onClick={() => {
-                  fetchNextSearchPage();
-                }}
-                disabled={!searchHasNextPage}
-                className="bg-blue-500 text-white px-4 py-2 rounded disabled:opacity-50"
+                onClick={() => fetchNextSearchPage()}
+                disabled={!searchHasNextPage || searchIsFetchingNextPage}
               >
-                {loadSearch
-                  ? "Loading..."
+                {searchIsFetchingNextPage
+                  ? "Loading more..."
                   : searchHasNextPage
                   ? "Load More"
-                  : "No More Data"}
+                  : "Nothing more to load"}
               </button>
             </div>
           )}
